@@ -94,7 +94,7 @@ public class AuthenticationService {
    * @return Optionally an authentication service. If empty then authentication isn't to be enabled
    *     on this service
    */
-  public static Optional<AuthenticationService> create(
+/*  public static Optional<AuthenticationService> create(
       final Vertx vertx, final WebSocketConfiguration config) {
     final Optional<JWTAuthOptions> jwtAuthOptions =
         makeJwtAuthOptions(
@@ -116,7 +116,7 @@ public class AuthenticationService {
             jwtAuthOptions.get(),
             credentialAuthProvider.get()));
   }
-
+*/
   private static Optional<JWTAuthOptions> makeJwtAuthOptions(
       final boolean authenticationEnabled, @Nullable final String authenticationCredentialsFile) {
     if (authenticationEnabled && authenticationCredentialsFile != null) {
