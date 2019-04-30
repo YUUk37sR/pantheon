@@ -1,10 +1,5 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal;
 
-import java.util.List;
-
-import graphql.language.ScalarTypeDefinition;
-import graphql.schema.Coercing;
-import graphql.schema.GraphQLDirective;
 import graphql.schema.GraphQLScalarType;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.AddressScalar;

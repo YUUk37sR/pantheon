@@ -19,7 +19,6 @@ import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
 import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationService;
 import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationUtils;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcMethod;
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRpcRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLRpcParameters;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcError;
@@ -47,6 +46,9 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+
+import graphql.GraphQL;
+
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -73,13 +75,13 @@ public class GraphQLRpcHttpService {
   private static final Logger LOG = LogManager.getLogger();
 
   private static final InetSocketAddress EMPTY_SOCKET_ADDRESS = new InetSocketAddress("0.0.0.0", 0);
-  private static final String APPLICATION_JSON = "application/json";
+  private static final String APPLICATION_GRAPHQL = "application/graphql";
   private static final GraphQLRpcResponse NO_RESPONSE = new GraphQLRpcNoResponse();
   private static final String EMPTY_RESPONSE = "";
 
   private final Vertx vertx;
   private final GraphQLRpcConfiguration config;
-  private final Map<String, GraphQLRpcMethod> graphQLRpcMethods;
+  private final GraphQL graphQL;
   private final Path dataDir;
   private final LabelledMetric<OperationTimer> requestTimer;
 
@@ -101,13 +103,13 @@ public class GraphQLRpcHttpService {
       final Path dataDir,
       final GraphQLRpcConfiguration config,
       final MetricsSystem metricsSystem,
-      final Map<String, GraphQLRpcMethod> methods) {
+      final GraphQL graphQL) {
     this(
         vertx,
         dataDir,
         config,
         metricsSystem,
-        methods,
+        graphQL,
         AuthenticationService.create(vertx, config));
   }
 
@@ -116,7 +118,7 @@ public class GraphQLRpcHttpService {
       final Path dataDir,
       final GraphQLRpcConfiguration config,
       final MetricsSystem metricsSystem,
-      final Map<String, GraphQLRpcMethod> methods,
+      final GraphQL graphQL,
       final Optional<AuthenticationService> authenticationService) {
     this.dataDir = dataDir;
     requestTimer =
@@ -128,7 +130,7 @@ public class GraphQLRpcHttpService {
     validateConfig(config);
     this.config = config;
     this.vertx = vertx;
-    this.graphQLRpcMethods = methods;
+    this.graphQL = graphQL;
     this.authenticationService = authenticationService;
   }
 
@@ -140,13 +142,13 @@ public class GraphQLRpcHttpService {
   }
 
   public CompletableFuture<?> start() {
-    LOG.info("Starting GraphQLRPC service on {}:{}", config.getHost(), config.getPort());
+    LOG.info("Starting GraphQL RPC service on {}:{}", config.getHost(), config.getPort());
     // Create the HTTP server and a router object.
     httpServer =
         vertx.createHttpServer(
             new HttpServerOptions().setHost(config.getHost()).setPort(config.getPort()));
 
-    // Handle json rpc requests
+    // Handle GraphQL requests
     final Router router = Router.router(vertx);
 
     // Verify Host header to avoid rebind attack.
@@ -168,7 +170,7 @@ public class GraphQLRpcHttpService {
     router
         .route("/")
         .method(HttpMethod.POST)
-        .produces(APPLICATION_JSON)
+        .produces(APPLICATION_GRAPHQL)
         .handler(this::handleGraphQLRpcRequest);
 
     final CompletableFuture<?> resultFuture = new CompletableFuture<>();
@@ -243,7 +245,7 @@ public class GraphQLRpcHttpService {
       return CompletableFuture.completedFuture(null);
     }
 
-    final CompletableFuture<?> resultFuture = new CompletableFuture<>();
+  final CompletableFuture<?> resultFuture = new CompletableFuture<>();
     httpServer.close(
         res -> {
           if (res.failed()) {
@@ -329,7 +331,7 @@ public class GraphQLRpcHttpService {
 
           final GraphQLRpcResponse graphQLRpcResponse = (GraphQLRpcResponse) res.result();
           response.setStatusCode(status(graphQLRpcResponse).code());
-          response.putHeader("Content-Type", APPLICATION_JSON);
+          response.putHeader("Content-Type", APPLICATION_GRAPHQL);
           response.end(serialise(graphQLRpcResponse));
         });
   }
