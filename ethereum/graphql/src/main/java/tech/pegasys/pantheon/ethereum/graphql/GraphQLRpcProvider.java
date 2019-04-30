@@ -8,6 +8,12 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import graphql.schema.idl.TypeRuntimeWiring;
+import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.AddressScalar;
+import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.BigIntScalar;
+import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.Bytes32Scalar;
+import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.BytesScalar;
+import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.LongScalar;
 
 public class GraphQLRpcProvider {
   
@@ -22,10 +28,16 @@ public class GraphQLRpcProvider {
       return GraphQL.newGraphQL(graphQLSchema).build();
   }
   
-  private RuntimeWiring buildRuntimeWiring() {
+  private static RuntimeWiring buildRuntimeWiring() {
 	  return RuntimeWiring.newRuntimeWiring()
-			 .scalar(Scalars) 
-			 .build()
+			 .scalar(new AddressScalar())
+			 .scalar(new BytesScalar())
+			 .scalar(new Bytes32Scalar())
+			 .scalar(new BigIntScalar())
+			 .scalar(new LongScalar())
+			 .type(TypeRuntimeWiring.newTypeWiring("Query")
+				    .dataFetcher("block", GraphQLDataFetchers.getBlockDataFetcher()))
+			 .build();
   }
 
 }
