@@ -38,7 +38,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.concurrent.CompletableFuture;
@@ -426,13 +425,13 @@ public class GraphQLRpcHttpService {
     String query = request.getQuery();
     
     if (query == null) {
+    	LOG.info("Bad GET request: no query variable named \"query\" given");
     	return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
-        LOG.info("Bad GET request: no query variable named \"query\" given");
     }	
-    if (AuthenticationUtils.isPermitted(authenticationService, user, method)) {
+//    if (AuthenticationUtils.isPermitted(authenticationService, user)) {
       // Generate response
       try (final TimingContext ignored = requestTimer.labels(request.getQuery()).startTimer()) {
-        return method.response(request);
+        return (GraphQLRpcResponse) graphQL.execute(query);
       } catch (final InvalidGraphQLRpcParameters e) {
         LOG.debug(e);
         return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
@@ -440,9 +439,9 @@ public class GraphQLRpcHttpService {
         LOG.error("Error processing GRAPHQL-RPC request", e);
         return errorResponse(id, GraphQLRpcError.INTERNAL_ERROR);
       }
-    } else {
+/*    } else {
       return unauthorizedResponse(id, GraphQLRpcError.UNAUTHORIZED);
-    }
+    } */
   }
 
   private void handleGraphQLRpcError(

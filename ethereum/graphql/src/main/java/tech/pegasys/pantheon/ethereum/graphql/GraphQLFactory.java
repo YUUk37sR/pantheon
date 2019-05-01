@@ -110,7 +110,7 @@ public class GraphQLFactory {
 	  final Map<String, TypeRuntimeWiring> typeWirings = new HashMap<>();
 	  fetchers.put("block",new BlockDataFetcher(blockchainQueries));
 	  fetchers.put("blocks",new BlockListFetcher(blockchainQueries));
-	  typeWirings.put("Query", new Query(fetchers).getWiring());
+	  typeWirings.put("Query", new QueryResolver(fetchers).getWiring());
 	  SchemaParser schemaParser = new SchemaParser();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
 
@@ -129,6 +129,7 @@ public class GraphQLFactory {
 			 .scalar(Scalars.BigInt)
 			 .scalar(Scalars.Long)
 			 .type(typeWirings.get("Query"))
+			 .type(typeWirings.get("Block"))
 			 .build();
   }
 

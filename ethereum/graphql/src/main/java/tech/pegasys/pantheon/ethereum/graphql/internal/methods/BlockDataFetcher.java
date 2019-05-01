@@ -7,7 +7,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResult;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
 
-public class BlockDataFetcher implements DataFetcher<Block> {
+public class BlockDataFetcher implements DataFetcher<BlockResult> {
 	private final BlockchainQueries blockchain;
 	private final BlockResultFactory blockResult = new BlockResultFactory();
 	
@@ -16,8 +16,9 @@ public class BlockDataFetcher implements DataFetcher<Block> {
 	}
 	
 	@Override
-	public Block get(DataFetchingEnvironment environment) throws Exception {
+	public BlockResult get(DataFetchingEnvironment environment) throws Exception {
 		BlockResult result;
+		
 		Long number = environment.getArgument("number");
 		Hash hash = environment.getArgument("hash");
 		if(hash != null) {
@@ -27,7 +28,7 @@ public class BlockDataFetcher implements DataFetcher<Block> {
 		} else {
 			result = blockchain.latestBlock().map(tx -> blockResult.transactionComplete(tx)).orElse(null);;
 		}
-		return null;
+		return result;
 	}
 
 }
