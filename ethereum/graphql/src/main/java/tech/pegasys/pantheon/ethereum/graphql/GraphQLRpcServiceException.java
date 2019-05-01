@@ -13,8 +13,8 @@
 package tech.pegasys.pantheon.ethereum.graphql;
 
 public class GraphQLRpcServiceException extends RuntimeException {
-	
+
   public GraphQLRpcServiceException(final String message) {
-	super(message);
+    super(message);
   }
 }

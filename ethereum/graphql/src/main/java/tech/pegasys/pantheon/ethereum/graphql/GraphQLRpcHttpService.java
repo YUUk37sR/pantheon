@@ -45,9 +45,7 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
-
 import graphql.GraphQL;
-
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -244,7 +242,7 @@ public class GraphQLRpcHttpService {
       return CompletableFuture.completedFuture(null);
     }
 
-  final CompletableFuture<?> resultFuture = new CompletableFuture<>();
+    final CompletableFuture<?> resultFuture = new CompletableFuture<>();
     httpServer.close(
         res -> {
           if (res.failed()) {
@@ -423,23 +421,23 @@ public class GraphQLRpcHttpService {
     LOG.debug("GRAPHQL-RPC query -> {}", request.getQuery());
     // Find method handler
     String query = request.getQuery();
-    
+
     if (query == null) {
-    	LOG.info("Bad GET request: no query variable named \"query\" given");
-    	return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
-    }	
-//    if (AuthenticationUtils.isPermitted(authenticationService, user)) {
-      // Generate response
-      try (final TimingContext ignored = requestTimer.labels(request.getQuery()).startTimer()) {
-        return (GraphQLRpcResponse) graphQL.execute(query);
-      } catch (final InvalidGraphQLRpcParameters e) {
-        LOG.debug(e);
-        return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
-      } catch (final RuntimeException e) {
-        LOG.error("Error processing GRAPHQL-RPC request", e);
-        return errorResponse(id, GraphQLRpcError.INTERNAL_ERROR);
-      }
-/*    } else {
+      LOG.info("Bad GET request: no query variable named \"query\" given");
+      return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
+    }
+    //    if (AuthenticationUtils.isPermitted(authenticationService, user)) {
+    // Generate response
+    try (final TimingContext ignored = requestTimer.labels(request.getQuery()).startTimer()) {
+      return (GraphQLRpcResponse) graphQL.execute(query);
+    } catch (final InvalidGraphQLRpcParameters e) {
+      LOG.debug(e);
+      return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
+    } catch (final RuntimeException e) {
+      LOG.error("Error processing GRAPHQL-RPC request", e);
+      return errorResponse(id, GraphQLRpcError.INTERNAL_ERROR);
+    }
+    /*    } else {
       return unauthorizedResponse(id, GraphQLRpcError.UNAUTHORIZED);
     } */
   }
@@ -481,4 +479,3 @@ public class GraphQLRpcHttpService {
     }
   }
 }
-

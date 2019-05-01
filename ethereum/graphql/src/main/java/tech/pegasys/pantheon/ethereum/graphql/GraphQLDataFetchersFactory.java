@@ -1,28 +1,29 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.graphql;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
-import graphql.schema.DataFetcher;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
 import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.graphql.RpcApi;
 import tech.pegasys.pantheon.ethereum.graphql.internal.filter.FilterManager;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.parameters.GraphQLRpcParameter;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcMethod;
-import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.graphql.RpcApis;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.EthGetBlockByHash;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.parameters.GraphQLRpcParameter;
+import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
@@ -32,13 +33,21 @@ import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
 
-public class GraphQLDataFetchersFactory {
-	
-	private final BlockResultFactory blockResult = new BlockResultFactory();
-  	private final GraphQLRpcParameter parameter = new GraphQLRpcParameter();
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
-	public Map<String, DataFetcher> fetchers(
-	  final String clientVersion,
+import graphql.schema.DataFetcher;
+
+public class GraphQLDataFetchersFactory {
+
+  private final BlockResultFactory blockResult = new BlockResultFactory();
+  private final GraphQLRpcParameter parameter = new GraphQLRpcParameter();
+
+  public Map<String, DataFetcher> fetchers(
+      final String clientVersion,
       final int networkId,
       final GenesisConfigOptions genesisConfigOptions,
       final P2PNetwork peerNetworkingService,
@@ -57,32 +66,32 @@ public class GraphQLDataFetchersFactory {
       final PrivacyParameters privacyParameters,
       final GraphQLRpcConfiguration graphQLRpcConfiguration,
       final MetricsConfiguration metricsConfiguration) {
-		
-		final BlockchainQueries blockchainQueries =
-		        new BlockchainQueries(blockchain, worldStateArchive);
-		
-		    return fetchers(
-		        clientVersion,
-		        networkId,
-		        genesisConfigOptions,
-		        peerNetworkingService,
-		        blockchainQueries,
-		        synchronizer,
-		        protocolSchedule,
-		        filterManager,
-		        transactionPool,
-		        miningCoordinator,
-		        metricsSystem,
-		        supportedCapabilities,
-		        accountsWhitelistController,
-		        nodeWhitelistController,
-		        rpcApis,
-		        privacyParameters,
-		        graphQLRpcConfiguration,
-		        metricsConfiguration);
-	}
-	
-	public Map<String, DataFetcher> fetchers(
+
+    final BlockchainQueries blockchainQueries =
+        new BlockchainQueries(blockchain, worldStateArchive);
+
+    return fetchers(
+        clientVersion,
+        networkId,
+        genesisConfigOptions,
+        peerNetworkingService,
+        blockchainQueries,
+        synchronizer,
+        protocolSchedule,
+        filterManager,
+        transactionPool,
+        miningCoordinator,
+        metricsSystem,
+        supportedCapabilities,
+        accountsWhitelistController,
+        nodeWhitelistController,
+        rpcApis,
+        privacyParameters,
+        graphQLRpcConfiguration,
+        metricsConfiguration);
+  }
+
+  public Map<String, DataFetcher> fetchers(
       final String clientVersion,
       final int networkId,
       final GenesisConfigOptions genesisConfigOptions,
@@ -101,19 +110,18 @@ public class GraphQLDataFetchersFactory {
       final PrivacyParameters privacyParameters,
       final GraphQLRpcConfiguration graphQLRpcConfiguration,
       final MetricsConfiguration metricsConfiguration) {
-	    final Map<String, DataFetcher>  enabledFetchers = new HashMap<>();
-	      if (rpcApis.contains(RpcApis.ETH)) {
-	        addFetchers(
-	            enabledFetchers,
-	            new EthGetBlockByHash(blockchainQueries, blockResult, parameter));
-	      }
-      return  enabledFetchers;   
-	}
-	
+    final Map<String, DataFetcher> enabledFetchers = new HashMap<>();
+    if (rpcApis.contains(RpcApis.ETH)) {
+      addFetchers(
+          enabledFetchers, new EthGetBlockByHash(blockchainQueries, blockResult, parameter));
+    }
+    return enabledFetchers;
+  }
+
   private void addFetchers(
-	      final Map<String, DataFetcher> fetchers, final GraphQLRpcMethod... rpcMethods) {
-	    for (final GraphQLRpcMethod rpcMethod : rpcMethods) {
-	      fetchers.put(rpcMethod.getName(), rpcMethod);
-	    }
-	  }
+      final Map<String, DataFetcher> fetchers, final GraphQLRpcMethod... rpcMethods) {
+    for (final GraphQLRpcMethod rpcMethod : rpcMethods) {
+      fetchers.put(rpcMethod.getName(), rpcMethod);
+    }
+  }
 }

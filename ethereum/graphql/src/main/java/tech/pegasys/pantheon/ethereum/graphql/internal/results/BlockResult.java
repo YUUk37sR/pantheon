@@ -89,6 +89,7 @@ public class BlockResult implements GraphQLRpcResult {
     this.timestamp = Quantity.create(header.getTimestamp());
     this.ommers = ommers;
     this.transactions = transactions;
+    
   }
 
   @JsonGetter(value = "number")

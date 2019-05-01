@@ -14,7 +14,6 @@ package tech.pegasys.pantheon.ethereum.graphql.authentication;
 
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
 
-
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -94,29 +93,29 @@ public class AuthenticationService {
    * @return Optionally an authentication service. If empty then authentication isn't to be enabled
    *     on this service
    */
-/*  public static Optional<AuthenticationService> create(
-      final Vertx vertx, final WebSocketConfiguration config) {
-    final Optional<JWTAuthOptions> jwtAuthOptions =
-        makeJwtAuthOptions(
-            config.isAuthenticationEnabled(), config.getAuthenticationCredentialsFile());
-    if (!jwtAuthOptions.isPresent()) {
-      return Optional.empty();
-    }
+  /*  public static Optional<AuthenticationService> create(
+        final Vertx vertx, final WebSocketConfiguration config) {
+      final Optional<JWTAuthOptions> jwtAuthOptions =
+          makeJwtAuthOptions(
+              config.isAuthenticationEnabled(), config.getAuthenticationCredentialsFile());
+      if (!jwtAuthOptions.isPresent()) {
+        return Optional.empty();
+      }
 
-    final Optional<AuthProvider> credentialAuthProvider =
-        makeCredentialAuthProvider(
-            vertx, config.isAuthenticationEnabled(), config.getAuthenticationCredentialsFile());
-    if (!credentialAuthProvider.isPresent()) {
-      return Optional.empty();
-    }
+      final Optional<AuthProvider> credentialAuthProvider =
+          makeCredentialAuthProvider(
+              vertx, config.isAuthenticationEnabled(), config.getAuthenticationCredentialsFile());
+      if (!credentialAuthProvider.isPresent()) {
+        return Optional.empty();
+      }
 
-    return Optional.of(
-        new AuthenticationService(
-            jwtAuthOptions.map(o -> JWTAuth.create(vertx, o)).get(),
-            jwtAuthOptions.get(),
-            credentialAuthProvider.get()));
-  }
-*/
+      return Optional.of(
+          new AuthenticationService(
+              jwtAuthOptions.map(o -> JWTAuth.create(vertx, o)).get(),
+              jwtAuthOptions.get(),
+              credentialAuthProvider.get()));
+    }
+  */
   private static Optional<JWTAuthOptions> makeJwtAuthOptions(
       final boolean authenticationEnabled, @Nullable final String authenticationCredentialsFile) {
     if (authenticationEnabled && authenticationCredentialsFile != null) {

@@ -38,7 +38,8 @@ public class GraphQLRpcParameter {
   public <T> T required(final Object[] params, final int index, final Class<T> paramClass) {
     final Optional<T> optionalParam = optional(params, index, paramClass);
     if (!optionalParam.isPresent()) {
-      throw new InvalidGraphQLRpcParameters("Missing required json rpc parameter at index " + index);
+      throw new InvalidGraphQLRpcParameters(
+          "Missing required json rpc parameter at index " + index);
     }
 
     return optionalParam.get();

@@ -19,14 +19,12 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GraphQLRpcRequest {
 
   private final String query;
   private final Map<String, Object> variables;
   private final String operationName;
-
 
   @JsonCreator
   public GraphQLRpcRequest(
@@ -36,9 +34,7 @@ public class GraphQLRpcRequest {
     this.query = query;
     this.variables = variables;
     this.operationName = operationName;
-   
   }
-
 
   @JsonGetter("query")
   public String getQuery() {
@@ -49,10 +45,9 @@ public class GraphQLRpcRequest {
   public Map<String, Object> getVariables() {
     return variables;
   }
-  
+
   @JsonGetter("operationName")
   public String getOperationName() {
     return operationName;
   }
-
 }

@@ -100,7 +100,7 @@ public class BlockchainQueries {
    */
   public Optional<Wei> accountBalance(final Address address, final long blockNumber) {
     return fromAccount(address, blockNumber, Account::getBalance, Wei.ZERO);
-  }
+   }
 
   /**
    * Retrieves the code associated with the given account at a particular block number.

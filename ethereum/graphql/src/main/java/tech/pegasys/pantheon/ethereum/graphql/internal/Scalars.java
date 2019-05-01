@@ -1,6 +1,16 @@
+/*
+ * Copyright 2019 ConsenSys AG.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package tech.pegasys.pantheon.ethereum.graphql.internal;
-
-import graphql.schema.GraphQLScalarType;
 
 import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.AddressScalar;
 import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.BigIntScalar;
@@ -8,12 +18,13 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.Bytes32Scalar;
 import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.BytesScalar;
 import tech.pegasys.pantheon.ethereum.graphql.internal.scalars.LongScalar;
 
+import graphql.schema.GraphQLScalarType;
+
 public class Scalars {
 
-	public static GraphQLScalarType Address = new AddressScalar();
-	public static GraphQLScalarType Bytes = new BytesScalar();
-	public static GraphQLScalarType Bytes32 = new Bytes32Scalar();
-	public static GraphQLScalarType BigInt = new BigIntScalar();
-	public static GraphQLScalarType Long = new LongScalar();
-
+  public static GraphQLScalarType Address = new AddressScalar();
+  public static GraphQLScalarType Bytes = new BytesScalar();
+  public static GraphQLScalarType Bytes32 = new Bytes32Scalar();
+  public static GraphQLScalarType BigInt = new BigIntScalar();
+  public static GraphQLScalarType Long = new LongScalar();
 }
