@@ -13,6 +13,8 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 
 import tech.pegasys.pantheon.ethereum.core.BlockHeader;
+import tech.pegasys.pantheon.ethereum.core.Wei;
+import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import java.util.List;
@@ -53,7 +55,7 @@ public class BlockResult implements GraphQLRpcResult {
   private final String transactionsRoot;
   private final String stateRoot;
   private final String receiptsRoot;
-  private final String miner;
+  private final AccountResult miner;
   private final String difficulty;
   private final String totalDifficulty;
   private final String extraData;
@@ -79,7 +81,7 @@ public class BlockResult implements GraphQLRpcResult {
     this.transactionsRoot = header.getTransactionsRoot().toString();
     this.stateRoot = header.getStateRoot().toString();
     this.receiptsRoot = header.getReceiptsRoot().toString();
-    this.miner = header.getCoinbase().toString();
+    this.miner = new AccountResult(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY, UInt256.ZERO);
     this.difficulty = Quantity.create(header.getDifficulty());
     this.totalDifficulty = Quantity.create(totalDifficulty);
     this.extraData = header.getExtraData().toString();
@@ -138,7 +140,7 @@ public class BlockResult implements GraphQLRpcResult {
   }
 
   @JsonGetter(value = "miner")
-  public String getMiner() {
+  public AccountResult getMiner() {
     return miner;
   }
 

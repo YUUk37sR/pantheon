@@ -1,15 +1,10 @@
 package tech.pegasys.pantheon.ethereum.graphql.internal.typewirings;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.idl.RuntimeWiring;
-import graphql.schema.idl.SchemaGenerator;
-import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeRuntimeWiring;
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -20,6 +15,7 @@ import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.RpcApi;
 import tech.pegasys.pantheon.ethereum.graphql.internal.Scalars;
 import tech.pegasys.pantheon.ethereum.graphql.internal.filter.FilterManager;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.MinerDataFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockDataFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockListFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
@@ -64,7 +60,7 @@ public class GraphQLTypeWiringFactory {
 	            	  .dataFetcher("blocks", new BlockListFetcher(blockchainQueries))
 	            	  .build())
 	            .type(TypeRuntimeWiring.newTypeWiring("Block")
-	            	  .dataFetcher("miner", new AccountDataFetcher(blockchainQueries))
+	            	  .dataFetcher("miner", new MinerDataFetcher(blockchainQueries))
 	            	  .build())
 	            .build();
 	}

@@ -26,6 +26,7 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcErrorR
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcNoResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcResponseType;
+import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcSuccessResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcUnauthorizedResponse;
 import tech.pegasys.pantheon.metrics.LabelledMetric;
 import tech.pegasys.pantheon.metrics.MetricCategory;
@@ -45,7 +46,10 @@ import java.util.concurrent.CompletableFuture;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
+
+import graphql.ExecutionResult;
 import graphql.GraphQL;
+import graphql.GraphQLError;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -429,7 +433,11 @@ public class GraphQLRpcHttpService {
     //    if (AuthenticationUtils.isPermitted(authenticationService, user)) {
     // Generate response
     try (final TimingContext ignored = requestTimer.labels(request.getQuery()).startTimer()) {
-      return (GraphQLRpcResponse) graphQL.execute(query);
+      ExecutionResult result = graphQL.execute(query);
+      List<GraphQLError> errors = result.getErrors();
+      if(!errors.isEmpty())
+        return errorResponse(id, GraphQLRpcError.INTERNAL_ERROR); 	  
+      return new GraphQLRpcSuccessResponse(id,result.getData()) ;
     } catch (final InvalidGraphQLRpcParameters e) {
       LOG.debug(e);
       return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);

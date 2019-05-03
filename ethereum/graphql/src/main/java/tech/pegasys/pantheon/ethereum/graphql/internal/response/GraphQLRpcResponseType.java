@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.response;
 
-/** Various types of responses that the JSON-RPC component may produce. */
+/** Various types of responses that the GraphQL component may produce. */
 public enum GraphQLRpcResponseType {
   NONE,
   SUCCESS,
