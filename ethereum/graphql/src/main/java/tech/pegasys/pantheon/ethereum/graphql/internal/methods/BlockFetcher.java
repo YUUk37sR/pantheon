@@ -20,11 +20,11 @@ import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactor
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-public class BlockDataFetcher implements DataFetcher<BlockResult> {
+public class BlockFetcher implements DataFetcher<BlockResult>, GraphQLRpcFetcher {
   private final BlockchainQueries blockchain;
   private final BlockResultFactory blockResult = new BlockResultFactory();
 
-  public BlockDataFetcher(final BlockchainQueries blockchain) {
+  public BlockFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }
 
@@ -49,4 +49,16 @@ public class BlockDataFetcher implements DataFetcher<BlockResult> {
 
     return result;
   }
+
+	@Override
+	public String getType() {
+		return GraphQLRpcDataFetcherType.BLOCK.getType();
+	}
+	
+	@Override
+	public String getField() {
+		return GraphQLRpcDataFetcherType.BLOCK.getField();
+	}
+
+
 }

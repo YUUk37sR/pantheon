@@ -10,31 +10,37 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.graphql.internal.typewirings;
+package tech.pegasys.pantheon.ethereum.graphql.internal;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.Scalars;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockDataFetcher;
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockListFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlockFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.BlocksFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcDataFetcherType;
 import tech.pegasys.pantheon.ethereum.graphql.internal.methods.MinerDataFetcher;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 
 import graphql.schema.idl.RuntimeWiring;
+import graphql.schema.idl.RuntimeWiring.Builder;
 import graphql.schema.idl.TypeRuntimeWiring;
 
 public class GraphQLTypeWiringFactory {
+	
+  public GraphQLTypeWiringFactory() {
+	  
+  }
 
   public static RuntimeWiring getRunTimeWiring(final BlockchainQueries blockchainQueries) {
 
-    return RuntimeWiring.newRuntimeWiring()
-        .scalar(Scalars.Address)
-        .scalar(Scalars.Bytes)
-        .scalar(Scalars.Bytes32)
-        .scalar(Scalars.BigInt)
-        .scalar(Scalars.Long)
-        .type(
+    Builder runTimeWiringBuilder =  RuntimeWiring.newRuntimeWiring()
+        .scalar(Scalars.AddressScalar)
+        .scalar(Scalars.BytesScalar)
+        .scalar(Scalars.Bytes32Scalar)
+        .scalar(Scalars.BigIntScalar)
+        .scalar(Scalars.LongScalar);
+    runTimeWiringBuilder.type(GraphQLRpcDataFetcherType.BLOCK.getType(), builder -> builder.dataFetcher(GraphQLRpcDataFetcherType.BLOCK.getField(), new BlockFetcher(blockchainQueries)));
+    return runTimeWiringBuilder.type(
             TypeRuntimeWiring.newTypeWiring("Query")
-                .dataFetcher("block", new BlockDataFetcher(blockchainQueries))
-                .dataFetcher("blocks", new BlockListFetcher(blockchainQueries))
+                .dataFetcher("block", new BlockFetcher(blockchainQueries))
+                .dataFetcher("blocks", new BlocksFetcher(blockchainQueries))
                 .build())
         .type(
             TypeRuntimeWiring.newTypeWiring("Block")

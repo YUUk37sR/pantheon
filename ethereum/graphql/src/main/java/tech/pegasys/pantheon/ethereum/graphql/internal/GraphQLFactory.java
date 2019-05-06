@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package tech.pegasys.pantheon.ethereum.graphql;
+package tech.pegasys.pantheon.ethereum.graphql.internal;
 
 import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
@@ -18,8 +18,8 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.typewirings.GraphQLTypeWiringFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
 import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
 import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
@@ -28,6 +28,8 @@ import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioning
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.metrics.MetricsSystem;
 import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+
 
 import java.io.File;
 import java.util.Collection;

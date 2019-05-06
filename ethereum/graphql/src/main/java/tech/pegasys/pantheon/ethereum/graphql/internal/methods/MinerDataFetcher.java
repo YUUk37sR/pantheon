@@ -15,14 +15,14 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.AccountResult;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-public class MinerDataFetcher implements DataFetcher<AccountResult> {
+public class MinerDataFetcher implements DataFetcher<Account> {
 
   private final BlockchainQueries blockchain;
 
@@ -31,14 +31,14 @@ public class MinerDataFetcher implements DataFetcher<AccountResult> {
   }
 
   @Override
-  public AccountResult get(final DataFetchingEnvironment environment) throws Exception {
+  public Account get(final DataFetchingEnvironment environment) throws Exception {
     long blockNumber = environment.getArgument("block");
     Address address =
         blockchain
             .getBlockHeaderByNumber(blockNumber)
             .map(header -> header.getCoinbase())
             .orElse(null);
-    return new AccountResult(
+    return new Account(
         address,
         blockchain.accountBalance(address, blockNumber).map(balance -> balance).orElse(Wei.ZERO),
         blockchain.accountNonce(address, blockNumber).map(count -> count.longValue()).orElse(0L),

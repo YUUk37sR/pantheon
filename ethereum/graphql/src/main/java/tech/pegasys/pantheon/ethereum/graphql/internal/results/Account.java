@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonPropertyOrder({"address", "balance", "transactionCount", "code", "storage"})
-public class AccountResult implements GraphQLRpcResult {
+public class Account {
 
   private final String address;
   private final String balance;
@@ -29,7 +29,7 @@ public class AccountResult implements GraphQLRpcResult {
   private final String code;
   private final String storage;
 
-  public AccountResult(
+  public Account(
       final Address address,
       final Wei balance,
       final Long transactionCount,

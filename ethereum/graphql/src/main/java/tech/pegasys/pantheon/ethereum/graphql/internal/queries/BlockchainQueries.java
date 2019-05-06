@@ -27,7 +27,6 @@ import tech.pegasys.pantheon.ethereum.core.Transaction;
 import tech.pegasys.pantheon.ethereum.core.TransactionReceipt;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.core.WorldState;
-import tech.pegasys.pantheon.ethereum.graphql.internal.filter.LogsQuery;
 import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
 import tech.pegasys.pantheon.util.uint.UInt256;
@@ -37,8 +36,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import com.google.common.collect.Lists;
 
 public class BlockchainQueries {
 
@@ -480,87 +477,7 @@ public class BlockchainQueries {
             header.getNumber()));
   }
 
-  /**
-   * Retrieve logs from the range of blocks with optional filtering based on logger address and log
-   * topics.
-   *
-   * @param fromBlockNumber The block number defining the first block in the search range
-   *     (inclusive).
-   * @param toBlockNumber The block number defining the last block in the search range (inclusive).
-   * @param query Constraints on required topics by topic index. For a given index if the set of
-   *     topics is non-empty, the topic at this index must match one of the values in the set.
-   * @return The set of logs matching the given constraints.
-   */
-  public List<LogWithMetadata> matchingLogs(
-      final long fromBlockNumber, final long toBlockNumber, final LogsQuery query) {
-    if (fromBlockNumber > toBlockNumber || toBlockNumber > headBlockNumber()) {
-      return Lists.newArrayList();
-    }
-    List<LogWithMetadata> matchingLogs = Lists.newArrayList();
-    for (long blockNumber = fromBlockNumber; blockNumber <= toBlockNumber; blockNumber++) {
-      final Hash blockhash = blockchain.getBlockHashByNumber(blockNumber).get();
-      final boolean logHasBeenRemoved = !blockchain.blockIsOnCanonicalChain(blockhash);
-      final List<TransactionReceipt> receipts = blockchain.getTxReceipts(blockhash).get();
-      final List<Transaction> transaction =
-          blockchain.getBlockBody(blockhash).get().getTransactions();
-      matchingLogs =
-          generateLogWithMetadata(
-              receipts,
-              blockNumber,
-              query,
-              blockhash,
-              matchingLogs,
-              transaction,
-              logHasBeenRemoved);
-    }
-    return matchingLogs;
-  }
-
-  public List<LogWithMetadata> matchingLogs(final Hash blockhash, final LogsQuery query) {
-    final List<LogWithMetadata> matchingLogs = Lists.newArrayList();
-    Optional<BlockHeader> blockHeader = blockchain.getBlockHeader(blockhash);
-    if (!blockHeader.isPresent()) {
-      return matchingLogs;
-    }
-    final List<TransactionReceipt> receipts = blockchain.getTxReceipts(blockhash).get();
-    final List<Transaction> transaction =
-        blockchain.getBlockBody(blockhash).get().getTransactions();
-    final long number = blockHeader.get().getNumber();
-    final boolean logHasBeenRemoved = !blockchain.blockIsOnCanonicalChain(blockhash);
-    return generateLogWithMetadata(
-        receipts, number, query, blockhash, matchingLogs, transaction, logHasBeenRemoved);
-  }
-
-  private List<LogWithMetadata> generateLogWithMetadata(
-      final List<TransactionReceipt> receipts,
-      final long number,
-      final LogsQuery query,
-      final Hash blockhash,
-      final List<LogWithMetadata> matchingLogs,
-      final List<Transaction> transaction,
-      final boolean removed) {
-    for (int transactionIndex = 0; transactionIndex < receipts.size(); ++transactionIndex) {
-      final TransactionReceipt receipt = receipts.get(transactionIndex);
-      for (int logIndex = 0; logIndex < receipt.getLogs().size(); ++logIndex) {
-        if (query.matches(receipt.getLogs().get(logIndex))) {
-          final LogWithMetadata logWithMetaData =
-              LogWithMetadata.create(
-                  logIndex,
-                  number,
-                  blockhash,
-                  transaction.get(transactionIndex).hash(),
-                  transactionIndex,
-                  receipts.get(transactionIndex).getLogs().get(logIndex).getLogger(),
-                  receipts.get(transactionIndex).getLogs().get(logIndex).getData(),
-                  receipts.get(transactionIndex).getLogs().get(logIndex).getTopics(),
-                  removed);
-          matchingLogs.add(logWithMetaData);
-        }
-      }
-    }
-    return matchingLogs;
-  }
-
+    
   /**
    * Returns the world state for the corresponding block number
    *

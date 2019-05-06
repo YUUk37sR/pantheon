@@ -12,6 +12,9 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql;
 
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApis;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -39,7 +42,7 @@ public class GraphQLRpcConfiguration {
     config.setEnabled(false);
     config.setPort(DEFAULT_GRAPHQL_RPC_PORT);
     config.setHost(DEFAULT_GRAPHQL_RPC_HOST);
-    config.rpcApis = RpcApis.DEFAULT_GRAPHQL_RPC_APIS;
+    config.rpcApis = RpcApis.DEFAULT_JSON_RPC_APIS;
     return config;
   }
 

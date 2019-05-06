@@ -12,7 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.authentication;
 
-import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcMethod;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcFetcher;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -31,7 +31,7 @@ public class AuthenticationUtils {
   public static boolean isPermitted(
       final Optional<AuthenticationService> authenticationService,
       final Optional<User> optionalUser,
-      final GraphQLRpcMethod graphQLRpcMethod) {
+      final GraphQLRpcFetcher graphQLRpcMethod) {
 
     AtomicBoolean foundMatchingPermission = new AtomicBoolean();
 

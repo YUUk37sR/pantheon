@@ -15,17 +15,12 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-import tech.pegasys.pantheon.ethereum.graphql.GraphQLFactory;
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRpcRequest;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcSuccessResponse;
-import tech.pegasys.pantheon.ethereum.graphql.internal.typewirings.GraphQLTypeWiringFactory;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import graphql.GraphQL;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,14 +33,15 @@ public class EthBlockNumberTest {
   private final String QUERY = "{block(number: 123456) { number } }";
   private final Map<String, Object> VARIABLES = new HashMap<>();
   private final String OPERATION_NAME = "";
-  //private GraphQL graphQL;
+  // private GraphQL graphQL;
 
   @Mock private BlockchainQueries blockchainQueries;
 
   @Before
   public void setUp() {
-    //this.graphQL =
-    //    new GraphQLFactory().graphQL(GraphQLTypeWiringFactory.getRunTimeWiring(blockchainQueries));
+    // this.graphQL =
+    //    new
+    // GraphQLFactory().graphQL(GraphQLTypeWiringFactory.getRunTimeWiring(blockchainQueries));
   }
 
   @Test

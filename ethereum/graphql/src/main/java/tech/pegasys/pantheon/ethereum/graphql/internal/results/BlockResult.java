@@ -44,7 +44,7 @@ import com.fasterxml.jackson.databind.JsonNode;
   "uncles",
   "transactions"
 })
-public class BlockResult implements GraphQLRpcResult {
+public class BlockResult {
 
   private final String number;
   private final String hash;
@@ -55,7 +55,7 @@ public class BlockResult implements GraphQLRpcResult {
   private final String transactionsRoot;
   private final String stateRoot;
   private final String receiptsRoot;
-  private final AccountResult miner;
+  private final Account miner;
   private final String difficulty;
   private final String totalDifficulty;
   private final String extraData;
@@ -82,7 +82,7 @@ public class BlockResult implements GraphQLRpcResult {
     this.stateRoot = header.getStateRoot().toString();
     this.receiptsRoot = header.getReceiptsRoot().toString();
     this.miner =
-        new AccountResult(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY, UInt256.ZERO);
+        new Account(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY, UInt256.ZERO);
     this.difficulty = Quantity.create(header.getDifficulty());
     this.totalDifficulty = Quantity.create(totalDifficulty);
     this.extraData = header.getExtraData().toString();
@@ -140,7 +140,7 @@ public class BlockResult implements GraphQLRpcResult {
   }
 
   @JsonGetter(value = "miner")
-  public AccountResult getMiner() {
+  public Account getMiner() {
     return miner;
   }
 

@@ -24,11 +24,11 @@ import java.util.List;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-public class BlockListFetcher implements DataFetcher<List<BlockResult>> {
+public class BlocksFetcher implements DataFetcher<List<BlockResult>>, GraphQLRpcFetcher{
   private final BlockchainQueries blockchain;
   private final BlockResultFactory blockResult = new BlockResultFactory();
 
-  public BlockListFetcher(final BlockchainQueries blockchain) {
+  public BlocksFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }
 
@@ -49,4 +49,14 @@ public class BlockListFetcher implements DataFetcher<List<BlockResult>> {
 
     return resultList;
   }
+
+	@Override
+	public String getType() {
+		return GraphQLRpcDataFetcherType.BLOCKS.getType();
+	}
+	
+	@Override
+	public String getField() {
+		return GraphQLRpcDataFetcherType.BLOCKS.getField();
+	}
 }
