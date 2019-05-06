@@ -29,7 +29,7 @@ public class BlockDataFetcher implements DataFetcher<BlockResult> {
   }
 
   @Override
-  public BlockResult get(DataFetchingEnvironment environment) throws Exception {
+  public BlockResult get(final DataFetchingEnvironment environment) throws Exception {
     BlockResult result;
 
     Long number = environment.getArgument("number");
@@ -46,7 +46,7 @@ public class BlockDataFetcher implements DataFetcher<BlockResult> {
     } else {
       result = blockchain.latestBlock().map(tx -> blockResult.transactionComplete(tx)).orElse(null);
     }
-    
+
     return result;
   }
 }

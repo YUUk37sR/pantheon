@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.exception;
 
+@SuppressWarnings("serial")
 public class InvalidGraphQLRpcParameters extends InvalidGraphQLRpcRequestException {
 
   public InvalidGraphQLRpcParameters(final String s) {

@@ -30,13 +30,13 @@ public class BytesScalar extends GraphQLScalarType {
     this("Bytes", "A Bytes Scalar");
   }
 
-  BytesScalar(String name, String description) {
+  BytesScalar(final String name, final String description) {
     super(
         name,
         description,
         new Coercing<BytesValue, String>() {
           @Override
-          public String serialize(Object input) throws CoercingSerializeException {
+          public String serialize(final Object input) throws CoercingSerializeException {
             Optional<BytesValue> bytes;
             if (input instanceof String)
               bytes = Optional.of(parseBytes(input.toString(), CoercingSerializeException::new));
@@ -49,7 +49,7 @@ public class BytesScalar extends GraphQLScalarType {
           }
 
           @Override
-          public BytesValue parseValue(Object input) throws CoercingParseValueException {
+          public BytesValue parseValue(final Object input) throws CoercingParseValueException {
             String bytesStr;
             if (input instanceof String) {
               bytesStr = String.valueOf(input);
@@ -65,7 +65,7 @@ public class BytesScalar extends GraphQLScalarType {
           }
 
           @Override
-          public BytesValue parseLiteral(Object input) throws CoercingParseLiteralException {
+          public BytesValue parseLiteral(final Object input) throws CoercingParseLiteralException {
             if (!(input instanceof StringValue)) {
               throw new CoercingParseLiteralException(
                   "Expected AST type 'StringValue' but was '" + input + "'.");
@@ -74,7 +74,7 @@ public class BytesScalar extends GraphQLScalarType {
           }
 
           private BytesValue parseBytes(
-              String input, Function<String, RuntimeException> exceptionMaker) {
+              final String input, final Function<String, RuntimeException> exceptionMaker) {
             try {
               return BytesValue.fromHexString(input);
             } catch (IllegalArgumentException e) {
@@ -84,7 +84,7 @@ public class BytesScalar extends GraphQLScalarType {
         });
   }
 
-  private static Optional<BytesValue> toBytes(Object input) {
+  private static Optional<BytesValue> toBytes(final Object input) {
     if (input instanceof BytesValue) return Optional.of((BytesValue) input);
     return Optional.empty();
   }

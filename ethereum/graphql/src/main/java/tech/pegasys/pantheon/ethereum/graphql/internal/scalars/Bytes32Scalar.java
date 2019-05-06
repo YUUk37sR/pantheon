@@ -30,13 +30,13 @@ public class Bytes32Scalar extends GraphQLScalarType {
     this("Bytes32", "A Bytes32 Scalar");
   }
 
-  Bytes32Scalar(String name, String description) {
+  Bytes32Scalar(final String name, final String description) {
     super(
         name,
         description,
         new Coercing<Bytes32, String>() {
           @Override
-          public String serialize(Object input) throws CoercingSerializeException {
+          public String serialize(final Object input) throws CoercingSerializeException {
             Optional<Bytes32> bytes32;
             if (input instanceof String)
               bytes32 =
@@ -50,7 +50,7 @@ public class Bytes32Scalar extends GraphQLScalarType {
           }
 
           @Override
-          public Bytes32 parseValue(Object input) throws CoercingParseValueException {
+          public Bytes32 parseValue(final Object input) throws CoercingParseValueException {
             String bytes32Str;
             if (input instanceof String) {
               bytes32Str = String.valueOf(input);
@@ -66,7 +66,7 @@ public class Bytes32Scalar extends GraphQLScalarType {
           }
 
           @Override
-          public Bytes32 parseLiteral(Object input) throws CoercingParseLiteralException {
+          public Bytes32 parseLiteral(final Object input) throws CoercingParseLiteralException {
             if (!(input instanceof StringValue)) {
               throw new CoercingParseLiteralException(
                   "Expected AST type 'StringValue' but was '" + input + "'.");
@@ -76,7 +76,7 @@ public class Bytes32Scalar extends GraphQLScalarType {
           }
 
           private Bytes32 parseBytes32(
-              String input, Function<String, RuntimeException> exceptionMaker) {
+              final String input, final Function<String, RuntimeException> exceptionMaker) {
             try {
               return Bytes32.fromHexStringStrict(input);
             } catch (IllegalArgumentException e) {
@@ -86,7 +86,7 @@ public class Bytes32Scalar extends GraphQLScalarType {
         });
   }
 
-  private static Optional<Bytes32> toBytes32(Object input) {
+  private static Optional<Bytes32> toBytes32(final Object input) {
     if (input instanceof Bytes32) return Optional.of((Bytes32) input);
     return Optional.empty();
   }

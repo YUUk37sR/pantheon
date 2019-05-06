@@ -31,13 +31,13 @@ public class TransactionDataFetcher implements DataFetcher<TransactionResult> {
   private final PendingTransactions pendingTransactions;
 
   public TransactionDataFetcher(
-      BlockchainQueries blockchain, PendingTransactions pendingTransactions) {
+      final BlockchainQueries blockchain, final PendingTransactions pendingTransactions) {
     this.blockchain = blockchain;
     this.pendingTransactions = pendingTransactions;
   }
 
   @Override
-  public TransactionResult get(DataFetchingEnvironment environment) throws Exception {
+  public TransactionResult get(final DataFetchingEnvironment environment) throws Exception {
 
     Hash hash = environment.getArgument("hash");
     if (hash == null)

@@ -20,14 +20,7 @@ import tech.pegasys.pantheon.util.uint.UInt256;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-
-@JsonPropertyOrder({
-  "address",
-  "balance",
-  "transactionCount",
-  "code",
-  "storage"
-})
+@JsonPropertyOrder({"address", "balance", "transactionCount", "code", "storage"})
 public class AccountResult implements GraphQLRpcResult {
 
   private final String address;
@@ -35,7 +28,6 @@ public class AccountResult implements GraphQLRpcResult {
   private final String transactionCount;
   private final String code;
   private final String storage;
-
 
   public AccountResult(
       final Address address,
@@ -74,6 +66,4 @@ public class AccountResult implements GraphQLRpcResult {
   public String getStorage() {
     return storage;
   }
-
 }
-

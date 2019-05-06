@@ -21,6 +21,9 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLFactory;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
+import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -82,6 +85,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.base.Preconditions;
+import graphql.GraphQL;
 import io.vertx.core.Vertx;
 
 public class RunnerBuilder {
@@ -96,6 +100,7 @@ public class RunnerBuilder {
   private int maxPeers;
   private JsonRpcConfiguration jsonRpcConfiguration;
   private WebSocketConfiguration webSocketConfiguration;
+  private GraphQLRpcConfiguration graphQLRpcConfiguration;
   private Path dataDir;
   private Collection<String> bannedNodeIds;
   private MetricsConfiguration metricsConfiguration;
@@ -159,6 +164,12 @@ public class RunnerBuilder {
 
   public RunnerBuilder webSocketConfiguration(final WebSocketConfiguration webSocketConfiguration) {
     this.webSocketConfiguration = webSocketConfiguration;
+    return this;
+  }
+
+  public RunnerBuilder graphQLRpcConfiguration(
+      final GraphQLRpcConfiguration graphQLRpcConfiguration) {
+    this.graphQLRpcConfiguration = graphQLRpcConfiguration;
     return this;
   }
 
@@ -389,6 +400,35 @@ public class RunnerBuilder {
                   vertx, webSocketConfiguration, subscriptionManager, webSocketsJsonRpcMethods));
     }
 
+    Optional<GraphQLRpcHttpService> graphQLRpcHttpService = Optional.empty();
+    if (graphQLRpcConfiguration.isEnabled()) {
+      final GraphQL graphQL =
+          new GraphQLFactory()
+              .graphQL(
+                  PantheonInfo.version(),
+                  ethNetworkConfig.getNetworkId(),
+                  pantheonController.getGenesisConfigOptions(),
+                  peerNetwork,
+                  context.getBlockchain(),
+                  context.getWorldStateArchive(),
+                  synchronizer,
+                  transactionPool,
+                  protocolSchedule,
+                  miningCoordinator,
+                  metricsSystem,
+                  supportedCapabilities,
+                  graphQLRpcConfiguration.getRpcApis(),
+                  accountWhitelistController,
+                  nodeWhitelistController,
+                  privacyParameters,
+                  graphQLRpcConfiguration,
+                  metricsConfiguration);
+      graphQLRpcHttpService =
+          Optional.of(
+              new GraphQLRpcHttpService(
+                  vertx, dataDir, graphQLRpcConfiguration, metricsSystem, graphQL));
+    }
+
     Optional<MetricsService> metricsService = Optional.empty();
     if (metricsConfiguration.isEnabled() || metricsConfiguration.isPushEnabled()) {
       metricsService = Optional.of(createMetricsService(vertx, metricsConfiguration));
@@ -399,6 +439,7 @@ public class RunnerBuilder {
         networkRunner,
         jsonRpcHttpService,
         webSocketService,
+        graphQLRpcHttpService,
         metricsService,
         pantheonController,
         dataDir);

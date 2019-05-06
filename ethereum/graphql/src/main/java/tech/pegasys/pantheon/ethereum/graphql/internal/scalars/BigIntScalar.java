@@ -26,16 +26,16 @@ import graphql.schema.GraphQLScalarType;
 public class BigIntScalar extends GraphQLScalarType {
 
   public BigIntScalar() {
-    this("BigInteger", "A BigInteger Scalar");
+    this("BigInt", "A BigInteger Scalar");
   }
 
-  BigIntScalar(String name, String description) {
+  BigIntScalar(final String name, final String description) {
     super(
         name,
         description,
         new Coercing<BigInteger, BigInteger>() {
           @Override
-          public BigInteger serialize(Object input) throws CoercingSerializeException {
+          public BigInteger serialize(final Object input) throws CoercingSerializeException {
             Optional<BigInteger> bigInt;
             if (input instanceof String)
               bigInt =
@@ -49,7 +49,7 @@ public class BigIntScalar extends GraphQLScalarType {
           }
 
           @Override
-          public BigInteger parseValue(Object input) throws CoercingParseValueException {
+          public BigInteger parseValue(final Object input) throws CoercingParseValueException {
             String bigIntStr;
             if (input instanceof String) {
               bigIntStr = String.valueOf(input);
@@ -65,7 +65,7 @@ public class BigIntScalar extends GraphQLScalarType {
           }
 
           @Override
-          public BigInteger parseLiteral(Object input) throws CoercingParseLiteralException {
+          public BigInteger parseLiteral(final Object input) throws CoercingParseLiteralException {
             if (!(input instanceof StringValue)) {
               throw new CoercingParseLiteralException(
                   "Expected AST type 'StringValue' but was '" + input + "'.");
@@ -75,7 +75,7 @@ public class BigIntScalar extends GraphQLScalarType {
           }
 
           private BigInteger parseBigInteger(
-              String input, Function<String, RuntimeException> exceptionMaker) {
+              final String input, final Function<String, RuntimeException> exceptionMaker) {
             try {
               BigInteger bigInt = new BigInteger(input);
               return bigInt;
@@ -86,7 +86,7 @@ public class BigIntScalar extends GraphQLScalarType {
         });
   }
 
-  private static Optional<BigInteger> toBigInteger(Object input) {
+  private static Optional<BigInteger> toBigInteger(final Object input) {
     if (input instanceof BigInteger) return Optional.of((BigInteger) input);
     return Optional.empty();
   }

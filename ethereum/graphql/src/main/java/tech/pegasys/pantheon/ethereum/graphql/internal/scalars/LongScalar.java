@@ -26,16 +26,16 @@ import graphql.schema.GraphQLScalarType;
 public class LongScalar extends GraphQLScalarType {
 
   public LongScalar() {
-    this("LongScalar", "A Long Scalar");
+    this("Long", "A Long Scalar");
   }
 
-  private LongScalar(String name, String description) {
+  private LongScalar(final String name, final String description) {
     super(
         name,
         description,
         new Coercing<UnsignedLong, String>() {
           @Override
-          public String serialize(Object input) throws CoercingSerializeException {
+          public String serialize(final Object input) throws CoercingSerializeException {
             Optional<UnsignedLong> unsignedLong;
             if (input instanceof String)
               unsignedLong =
@@ -49,7 +49,7 @@ public class LongScalar extends GraphQLScalarType {
           }
 
           @Override
-          public UnsignedLong parseValue(Object input) throws CoercingParseValueException {
+          public UnsignedLong parseValue(final Object input) throws CoercingParseValueException {
             String unsignedLongStr;
             if (input instanceof String) {
               unsignedLongStr = String.valueOf(input);
@@ -65,7 +65,8 @@ public class LongScalar extends GraphQLScalarType {
           }
 
           @Override
-          public UnsignedLong parseLiteral(Object input) throws CoercingParseLiteralException {
+          public UnsignedLong parseLiteral(final Object input)
+              throws CoercingParseLiteralException {
             if (!(input instanceof StringValue)) {
               throw new CoercingParseLiteralException(
                   "Expected AST type 'StringValue' but was '" + input + "'.");
@@ -75,7 +76,7 @@ public class LongScalar extends GraphQLScalarType {
           }
 
           private UnsignedLong parseUnsignedLong(
-              String input, Function<String, RuntimeException> exceptionMaker) {
+              final String input, final Function<String, RuntimeException> exceptionMaker) {
             try {
               return UnsignedLong.valueOf(input);
             } catch (NumberFormatException e) {
@@ -85,7 +86,7 @@ public class LongScalar extends GraphQLScalarType {
         });
   }
 
-  private static Optional<UnsignedLong> toUnsignedLong(Object input) {
+  private static Optional<UnsignedLong> toUnsignedLong(final Object input) {
     if (input instanceof UnsignedLong) return Optional.of((UnsignedLong) input);
     return Optional.empty();
   }

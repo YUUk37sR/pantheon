@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql;
 
+@SuppressWarnings("serial")
 public class GraphQLRpcServiceException extends RuntimeException {
 
   public GraphQLRpcServiceException(final String message) {

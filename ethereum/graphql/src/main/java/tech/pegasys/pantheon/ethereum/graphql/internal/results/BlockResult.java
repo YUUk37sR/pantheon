@@ -81,7 +81,8 @@ public class BlockResult implements GraphQLRpcResult {
     this.transactionsRoot = header.getTransactionsRoot().toString();
     this.stateRoot = header.getStateRoot().toString();
     this.receiptsRoot = header.getReceiptsRoot().toString();
-    this.miner = new AccountResult(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY, UInt256.ZERO);
+    this.miner =
+        new AccountResult(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY, UInt256.ZERO);
     this.difficulty = Quantity.create(header.getDifficulty());
     this.totalDifficulty = Quantity.create(totalDifficulty);
     this.extraData = header.getExtraData().toString();
@@ -91,7 +92,6 @@ public class BlockResult implements GraphQLRpcResult {
     this.timestamp = Quantity.create(header.getTimestamp());
     this.ommers = ommers;
     this.transactions = transactions;
-    
   }
 
   @JsonGetter(value = "number")

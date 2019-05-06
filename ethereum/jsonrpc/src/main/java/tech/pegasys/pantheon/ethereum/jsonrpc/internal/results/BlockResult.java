@@ -46,14 +46,14 @@ public class BlockResult implements JsonRpcResult {
 
   private final String number;
   private final String hash;
-  private final String parentHash; //Block Object
+  private final String parentHash; // Block Object
   private final String nonce;
-  private final String sha3Uncles; //ommerHash
-  private final String logsBloom; //Log Object
-  private final String transactionsRoot; //transactionCount
+  private final String sha3Uncles; // ommerHash
+  private final String logsBloom; // Log Object
+  private final String transactionsRoot; // transactionCount
   private final String stateRoot;
   private final String receiptsRoot;
-  private final String miner; //Account Object
+  private final String miner; // Account Object
   private final String difficulty;
   private final String totalDifficulty;
   private final String extraData;
@@ -61,8 +61,8 @@ public class BlockResult implements JsonRpcResult {
   private final String gasLimit;
   private final String gasUsed;
   private final String timestamp;
-  private final List<TransactionResult> transactions; //transactionAt
-  private final List<JsonNode> ommers; //ommerCount //ommerAt 
+  private final List<TransactionResult> transactions; // transactionAt
+  private final List<JsonNode> ommers; // ommerCount //ommerAt
   // mixHash
   // call -> CallResult Object
   // estimateGas

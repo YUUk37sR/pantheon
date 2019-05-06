@@ -72,6 +72,14 @@ class StandaloneCommand implements DefaultCommandValues {
   String rpcWsAuthenticationCredentialsFile = null;
 
   @CommandLine.Option(
+      names = {"--rpc-graphql-authentication-credentials-file"},
+      paramLabel = MANDATORY_FILE_FORMAT_HELP,
+      description =
+          "Storage file for GRAPHQL-RPC HTTP authentication credentials (default: ${DEFAULT-VALUE})",
+      arity = "1")
+  String rpcGraphQLAuthenticationCredentialsFile = null;
+
+  @CommandLine.Option(
       names = {"--privacy-public-key-file"},
       description = "The enclave's public key file")
   final File privacyPublicKeyFile = null;

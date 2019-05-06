@@ -31,14 +31,14 @@ public class AuthenticationUtils {
   public static boolean isPermitted(
       final Optional<AuthenticationService> authenticationService,
       final Optional<User> optionalUser,
-      final GraphQLRpcMethod GraphQLRpcMethod) {
+      final GraphQLRpcMethod graphQLRpcMethod) {
 
     AtomicBoolean foundMatchingPermission = new AtomicBoolean();
 
     if (authenticationService.isPresent()) {
       if (optionalUser.isPresent()) {
         User user = optionalUser.get();
-        for (String perm : GraphQLRpcMethod.getPermissions()) {
+        for (String perm : graphQLRpcMethod.getPermissions()) {
           user.isAuthorized(
               perm,
               (authed) -> {
@@ -46,7 +46,7 @@ public class AuthenticationUtils {
                   LOG.trace(
                       "user {} authorized : {} via permission {}",
                       user,
-                      GraphQLRpcMethod.getName(),
+                      graphQLRpcMethod.getName(),
                       perm);
                   foundMatchingPermission.set(true);
                 }
@@ -59,7 +59,7 @@ public class AuthenticationUtils {
     }
 
     if (!foundMatchingPermission.get()) {
-      LOG.trace("user NOT authorized : {}", GraphQLRpcMethod.getName());
+      LOG.trace("user NOT authorized : {}", graphQLRpcMethod.getName());
     }
     return foundMatchingPermission.get();
   }

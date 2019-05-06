@@ -12,6 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.exception;
 
+@SuppressWarnings("serial")
 public class InvalidGraphQLRpcRequestException extends IllegalArgumentException {
   public InvalidGraphQLRpcRequestException(final String message) {
     super(message);

@@ -30,13 +30,13 @@ public class AddressScalar extends GraphQLScalarType {
     this("Address", "An Address Scalar");
   }
 
-  AddressScalar(String name, String description) {
+  AddressScalar(final String name, final String description) {
     super(
         name,
         description,
         new Coercing<Address, String>() {
           @Override
-          public String serialize(Object input) throws CoercingSerializeException {
+          public String serialize(final Object input) throws CoercingSerializeException {
             Optional<Address> address;
             if (input instanceof String)
               address =
@@ -51,7 +51,7 @@ public class AddressScalar extends GraphQLScalarType {
           }
 
           @Override
-          public Address parseValue(Object input) throws CoercingParseValueException {
+          public Address parseValue(final Object input) throws CoercingParseValueException {
             String addressStr;
             if (input instanceof String) {
               addressStr = String.valueOf(input);
@@ -67,7 +67,7 @@ public class AddressScalar extends GraphQLScalarType {
           }
 
           @Override
-          public Address parseLiteral(Object input) throws CoercingParseLiteralException {
+          public Address parseLiteral(final Object input) throws CoercingParseLiteralException {
             if (!(input instanceof StringValue)) {
               throw new CoercingParseLiteralException(
                   "Expected AST type 'StringValue' but was '" + input + "'.");
@@ -77,7 +77,7 @@ public class AddressScalar extends GraphQLScalarType {
           }
 
           private Address parseAddress(
-              String input, Function<String, RuntimeException> exceptionMaker) {
+              final String input, final Function<String, RuntimeException> exceptionMaker) {
             Address address;
             try {
               address = Address.fromHexString(input);
@@ -89,7 +89,7 @@ public class AddressScalar extends GraphQLScalarType {
         });
   }
 
-  private static Optional<Address> toAddress(Object input) {
+  private static Optional<Address> toAddress(final Object input) {
     if (input instanceof Address) return Optional.of((Address) input);
     return Optional.empty();
   }

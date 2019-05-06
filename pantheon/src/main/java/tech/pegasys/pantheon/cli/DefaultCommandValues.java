@@ -47,6 +47,8 @@ public interface DefaultCommandValues {
       "/etc/pantheon/rpc_http_auth_config.toml";
   String DOCKER_RPC_WS_AUTHENTICATION_CREDENTIALS_FILE_LOCATION =
       "/etc/pantheon/rpc_ws_auth_config.toml";
+  String DOCKER_RPC_GRAPHQL_AUTHENTICATION_CREDENTIALS_FILE_LOCATION =
+      "/etc/pantheon/rpc_graphql_auth_config.toml";
   String DOCKER_PRIVACY_PUBLIC_KEY_FILE = "/etc/pantheon/privacy_public_key";
   String DOCKER_PERMISSIONS_CONFIG_FILE_LOCATION = "/etc/pantheon/permissions_config.toml";
   String PERMISSIONING_CONFIG_LOCATION = "permissions_config.toml";

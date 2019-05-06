@@ -18,7 +18,6 @@ import tech.pegasys.pantheon.ethereum.chain.Blockchain;
 import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
 import tech.pegasys.pantheon.ethereum.core.Synchronizer;
 import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.graphql.internal.filter.FilterManager;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.typewirings.GraphQLTypeWiringFactory;
 import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
@@ -42,10 +41,9 @@ import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
 
-
 public class GraphQLFactory {
 
-	public GraphQL graphQL(
+  public GraphQL graphQL(
       final String clientVersion,
       final int networkId,
       final GenesisConfigOptions genesisConfigOptions,
@@ -59,7 +57,6 @@ public class GraphQLFactory {
       final MetricsSystem metricsSystem,
       final Set<Capability> supportedCapabilities,
       final Collection<RpcApi> rpcApis,
-      final FilterManager filterManager,
       final Optional<AccountWhitelistController> accountsWhitelistController,
       final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
       final PrivacyParameters privacyParameters,
@@ -67,36 +64,17 @@ public class GraphQLFactory {
       final MetricsConfiguration metricsConfiguration) {
     final BlockchainQueries blockchainQueries =
         new BlockchainQueries(blockchain, worldStateArchive);
-    RuntimeWiring wiring = GraphQLTypeWiringFactory.getRunTimeWiring(
-    		clientVersion,
-            networkId,
-            genesisConfigOptions,
-            peerNetworkingService,
-            blockchainQueries,
-            synchronizer,
-            protocolSchedule,
-            filterManager,
-            transactionPool,
-            miningCoordinator,
-            metricsSystem,
-            supportedCapabilities,
-            accountsWhitelistController,
-            nodeWhitelistController,
-            rpcApis,
-            privacyParameters,
-            graphQLRpcConfiguration,
-            metricsConfiguration
-    		);
+    RuntimeWiring wiring = GraphQLTypeWiringFactory.getRunTimeWiring(blockchainQueries);
     return graphQL(wiring);
   }
 
-  public GraphQL graphQL(RuntimeWiring wiring) {
+  public GraphQL graphQL(final RuntimeWiring wiring) {
     SchemaParser schemaParser = new SchemaParser();
-    SchemaGenerator schemaGenerator = new SchemaGenerator();  
-    File schemaFile = new File(GraphQLFactory.class.getResource("schema.graphqls").getFile());
+    SchemaGenerator schemaGenerator = new SchemaGenerator();
+    File schemaFile =
+        new File(getClass().getClassLoader().getResource("schema.graphqls").getFile());
     TypeDefinitionRegistry typeRegistry = schemaParser.parse(schemaFile);
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
     return GraphQL.newGraphQL(graphQLSchema).build();
   }
-
 }

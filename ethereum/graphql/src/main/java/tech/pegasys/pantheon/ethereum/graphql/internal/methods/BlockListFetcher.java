@@ -33,7 +33,7 @@ public class BlockListFetcher implements DataFetcher<List<BlockResult>> {
   }
 
   @Override
-  public List<BlockResult> get(DataFetchingEnvironment environment) throws Exception {
+  public List<BlockResult> get(final DataFetchingEnvironment environment) throws Exception {
     List<BlockResult> resultList = new ArrayList<>();
 
     Long to = environment.getArgument("to");

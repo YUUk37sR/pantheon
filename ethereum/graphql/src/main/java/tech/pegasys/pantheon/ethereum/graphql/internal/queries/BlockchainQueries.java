@@ -100,8 +100,8 @@ public class BlockchainQueries {
    */
   public Optional<Wei> accountBalance(final Address address, final long blockNumber) {
     return fromAccount(address, blockNumber, Account::getBalance, Wei.ZERO);
-   }
-  
+  }
+
   /**
    * Returns the nonce of the given account at a specific block number.
    *
@@ -111,8 +111,8 @@ public class BlockchainQueries {
    */
   public Optional<Long> accountNonce(final Address address, final long blockNumber) {
     return fromAccount(address, blockNumber, Account::getNonce, 0L);
-   }
-  
+  }
+
   /**
    * Retrieves the code associated with the given account at a particular block number.
    *
