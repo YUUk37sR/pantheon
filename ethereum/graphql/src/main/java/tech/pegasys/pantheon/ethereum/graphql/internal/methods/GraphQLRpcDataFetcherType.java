@@ -55,5 +55,4 @@ public enum GraphQLRpcDataFetcherType {
   public String getField() {
     return field;
   }
-
 }

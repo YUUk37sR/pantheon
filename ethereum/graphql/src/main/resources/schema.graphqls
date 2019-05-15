@@ -249,12 +249,13 @@ type SyncState{
     currentBlock: Long!
     # HighestBlock is the latest known block number.
     highestBlock: Long!
+# !! The following is not supported in Pantheon !!
     # PulledStates is the number of state entries fetched so far, or null
     # if this is not known or not relevant.
-    pulledStates: Long
+#    pulledStates: Long
     # KnownStates is the number of states the node knows of so far, or null
     # if this is not known or not relevant.
-    knownStates: Long
+#    knownStates: Long
 }
 
 # Pending represents the current pending state.
@@ -269,7 +270,7 @@ type Pending {
   call(data: CallData!): CallResult
   # EstimateGas estimates the amount of gas that will be required for
   # successful execution of a transaction for the pending state.
-  estimateGas(data: CallData!): Long!  
+  estimateGas(data: CallData!): Long!
 }
 
 type Query {

@@ -12,14 +12,7 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.response;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-
 public interface GraphQLRpcResponse {
-
-  @JsonGetter("graphqlrpc")
-  default String getVersion() {
-    return "2.0";
-  }
 
   GraphQLRpcResponseType getType();
 }

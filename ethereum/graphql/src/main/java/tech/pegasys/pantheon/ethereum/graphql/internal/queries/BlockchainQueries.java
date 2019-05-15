@@ -477,7 +477,6 @@ public class BlockchainQueries {
             header.getNumber()));
   }
 
-    
   /**
    * Returns the world state for the corresponding block number
    *

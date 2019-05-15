@@ -12,71 +12,67 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal;
 
-import tech.pegasys.pantheon.config.GenesisConfigOptions;
-import tech.pegasys.pantheon.ethereum.blockcreation.MiningCoordinator;
-import tech.pegasys.pantheon.ethereum.chain.Blockchain;
-import tech.pegasys.pantheon.ethereum.core.PrivacyParameters;
-import tech.pegasys.pantheon.ethereum.core.Synchronizer;
-import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
-import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
-import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.mainnet.ProtocolSchedule;
-import tech.pegasys.pantheon.ethereum.p2p.api.P2PNetwork;
-import tech.pegasys.pantheon.ethereum.p2p.wire.Capability;
-import tech.pegasys.pantheon.ethereum.permissioning.AccountWhitelistController;
-import tech.pegasys.pantheon.ethereum.permissioning.NodeLocalConfigPermissioningController;
-import tech.pegasys.pantheon.ethereum.worldstate.WorldStateArchive;
-import tech.pegasys.pantheon.metrics.MetricsSystem;
-import tech.pegasys.pantheon.metrics.prometheus.MetricsConfiguration;
-import tech.pegasys.pantheon.ethereum.jsonrpc.RpcApi;
+import static graphql.schema.idl.RuntimeWiring.Builder;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcFetcher;
 
-import java.io.File;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import graphql.GraphQL;
+import graphql.schema.DataFetcher;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import graphql.schema.idl.TypeRuntimeWiring;
 
 public class GraphQLFactory {
 
-  public GraphQL graphQL(
-      final String clientVersion,
-      final int networkId,
-      final GenesisConfigOptions genesisConfigOptions,
-      final P2PNetwork peerNetworkingService,
-      final Blockchain blockchain,
-      final WorldStateArchive worldStateArchive,
-      final Synchronizer synchronizer,
-      final TransactionPool transactionPool,
-      final ProtocolSchedule<?> protocolSchedule,
-      final MiningCoordinator miningCoordinator,
-      final MetricsSystem metricsSystem,
-      final Set<Capability> supportedCapabilities,
-      final Collection<RpcApi> rpcApis,
-      final Optional<AccountWhitelistController> accountsWhitelistController,
-      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
-      final PrivacyParameters privacyParameters,
-      final GraphQLRpcConfiguration graphQLRpcConfiguration,
-      final MetricsConfiguration metricsConfiguration) {
-    final BlockchainQueries blockchainQueries =
-        new BlockchainQueries(blockchain, worldStateArchive);
-    RuntimeWiring wiring = GraphQLTypeWiringFactory.getRunTimeWiring(blockchainQueries);
-    return graphQL(wiring);
-  }
+  public static String SCHEMA = getSchemaFromResources();
 
-  public GraphQL graphQL(final RuntimeWiring wiring) {
+  @SuppressWarnings("rawtypes")
+  public GraphQL buildGraphQL(final Map<String, GraphQLRpcFetcher> fetchers) {
     SchemaParser schemaParser = new SchemaParser();
     SchemaGenerator schemaGenerator = new SchemaGenerator();
-    File schemaFile =
-        new File(getClass().getClassLoader().getResource("schema.graphqls").getFile());
-    TypeDefinitionRegistry typeRegistry = schemaParser.parse(schemaFile);
+    /*File schemaFile =
+    new File(getClass().getClassLoader().getResource("schema.graphqls").getFile());*/
+    TypeDefinitionRegistry typeRegistry = schemaParser.parse(SCHEMA);
+    RuntimeWiring wiring = buildRunTimeWiring(fetchers);
     GraphQLSchema graphQLSchema = schemaGenerator.makeExecutableSchema(typeRegistry, wiring);
     return GraphQL.newGraphQL(graphQLSchema).build();
+  }
+
+  @SuppressWarnings("rawtypes")
+  private RuntimeWiring buildRunTimeWiring(final Map<String, GraphQLRpcFetcher> fetchers) {
+
+    Builder runTimeWiringBuilder = RuntimeWiring.newRuntimeWiring();
+    runTimeWiringBuilder
+        .scalar(Scalars.AddressScalar)
+        .scalar(Scalars.BytesScalar)
+        .scalar(Scalars.Bytes32Scalar)
+        .scalar(Scalars.BigIntScalar)
+        .scalar(Scalars.LongScalar);
+    fetchers.forEach(
+        (typeName, fetcher) ->
+            runTimeWiringBuilder.type(
+                TypeRuntimeWiring.newTypeWiring(typeName)
+                    .dataFetcher(fetcher.getField(), (DataFetcher) fetcher)));
+    return runTimeWiringBuilder.build();
+  }
+
+  private static String getSchemaFromResources() {
+    ClassLoader classLoader = ClassLoader.getSystemClassLoader();
+    InputStream is = classLoader.getResourceAsStream("schema2.graphqls");
+    if (is != null) {
+      BufferedReader reader = new BufferedReader(new InputStreamReader(is, UTF_8));
+      return reader.lines().collect(Collectors.joining(System.lineSeparator()));
+    }
+    return null;
   }
 }

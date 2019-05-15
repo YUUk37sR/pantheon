@@ -15,31 +15,27 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.results;
 import tech.pegasys.pantheon.ethereum.core.Address;
 import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
-@JsonPropertyOrder({"address", "balance", "transactionCount", "code", "storage"})
+@JsonPropertyOrder({"address", "balance", "transactionCount", "code"})
 public class Account {
 
   private final String address;
   private final String balance;
   private final String transactionCount;
   private final String code;
-  private final String storage;
 
   public Account(
       final Address address,
       final Wei balance,
       final Long transactionCount,
-      final BytesValue code,
-      final UInt256 storage) {
+      final BytesValue code) {
     this.address = address.toString();
     this.balance = balance.toString();
     this.transactionCount = transactionCount.toString();
     this.code = code.toString();
-    this.storage = Quantity.create(storage);
   }
 
   @JsonGetter(value = "address")
@@ -60,10 +56,5 @@ public class Account {
   @JsonGetter(value = "code")
   public String getCode() {
     return code;
-  }
-
-  @JsonGetter(value = "storage")
-  public String getStorage() {
-    return storage;
   }
 }

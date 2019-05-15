@@ -17,32 +17,35 @@ import tech.pegasys.pantheon.ethereum.core.Wei;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.Account;
 import tech.pegasys.pantheon.util.bytes.BytesValue;
-import tech.pegasys.pantheon.util.uint.UInt256;
 
-import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 
-public class MinerDataFetcher implements DataFetcher<Account> {
-
+public class BlockAccountFetcher implements GraphQLRpcFetcher<Account> {
   private final BlockchainQueries blockchain;
+  private final long blockNumber;
 
-  public MinerDataFetcher(final BlockchainQueries blockchain) {
+  public BlockAccountFetcher(final BlockchainQueries blockchain, final long blockNumber) {
     this.blockchain = blockchain;
+    this.blockNumber = blockNumber;
   }
 
   @Override
   public Account get(final DataFetchingEnvironment environment) throws Exception {
-    long blockNumber = environment.getArgument("block");
-    Address address =
-        blockchain
-            .getBlockHeaderByNumber(blockNumber)
-            .map(header -> header.getCoinbase())
-            .orElse(null);
-    return new Account(
-        address,
-        blockchain.accountBalance(address, blockNumber).map(balance -> balance).orElse(Wei.ZERO),
-        blockchain.accountNonce(address, blockNumber).map(count -> count.longValue()).orElse(0L),
-        BytesValue.EMPTY,
-        UInt256.ZERO);
+    Address address = environment.getArgument("address");
+    Wei balance = blockchain.accountBalance(address, blockNumber).orElseGet(null);
+    Long nonce = blockchain.accountNonce(address, blockNumber).orElseGet(null);
+    BytesValue code = blockchain.getCode(address, blockNumber).orElseGet(null);
+
+    return new Account(address, balance, nonce, code);
+  }
+
+  @Override
+  public String getType() {
+    return GraphQLRpcDataFetcherType.ACCOUNT.getType();
+  }
+
+  @Override
+  public String getField() {
+    return GraphQLRpcDataFetcherType.ACCOUNT.getField();
   }
 }

@@ -94,7 +94,10 @@ public enum GraphQLRpcError {
   VALUE_NOT_ZERO(-50100, "We cannot transfer ether in private transaction yet."),
   DECODE_ERROR(-50100, "Unable to decode the private signed raw transaction"),
 
-  CANT_CONNECT_TO_LOCAL_PEER(-32100, "Cannot add local node as peer.");
+  CANT_CONNECT_TO_LOCAL_PEER(-32100, "Cannot add local node as peer."),
+
+  // GraphQL parameter errors
+  BLOCK_LIST_PARAMETER_ERROR(-40000, "from blocknumber should be less than to blocknumber");
 
   private final int code;
   private final String message;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 ConsenSys AG.
+ * Copyright 2019 ConsenSys AG.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,21 +12,27 @@
  */
 package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
-import graphql.schema.DataFetcher;
+import tech.pegasys.pantheon.util.bytes.Bytes32;
 
-public interface GraphQLRpcFetcher<T> extends DataFetcher<T> {
+import graphql.schema.DataFetchingEnvironment;
 
-  /**
-   * Standardised GraphQL Data Fetcher.
-   *
-   * @return GraphQL Data Fetcher Type.
-   */
-  String getType();
+public class AccountStorageFetcher implements GraphQLRpcFetcher<Bytes32> {
 
-  /**
-   * Standardised GraphQL Data Fetcher.
-   *
-   * @return GraphQL Data Fetcher Filed.
-   */
-  String getField();
+  public AccountStorageFetcher() {}
+
+  @Override
+  public Bytes32 get(final DataFetchingEnvironment environment) throws Exception {
+    Bytes32 slot = environment.getArgument("slot");
+    return slot;
+  }
+
+  @Override
+  public String getType() {
+    return GraphQLRpcDataFetcherType.STORAGE.getType();
+  }
+
+  @Override
+  public String getField() {
+    return GraphQLRpcDataFetcherType.STORAGE.getType();
+  }
 }

@@ -14,33 +14,41 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 
 import tech.pegasys.pantheon.ethereum.core.Hash;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResult;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
+import tech.pegasys.pantheon.util.bytes.Bytes32;
 
-import graphql.schema.DataFetcher;
+import com.google.common.primitives.UnsignedLong;
 import graphql.schema.DataFetchingEnvironment;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class BlockFetcher implements DataFetcher<BlockResult>, GraphQLRpcFetcher {
+public class QueryBlockFetcher implements GraphQLRpcFetcher<Block> {
+  private static final Logger LOG = LogManager.getLogger();
   private final BlockchainQueries blockchain;
   private final BlockResultFactory blockResult = new BlockResultFactory();
 
-  public BlockFetcher(final BlockchainQueries blockchain) {
+  public QueryBlockFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }
 
+  @SuppressWarnings("unused")
   @Override
-  public BlockResult get(final DataFetchingEnvironment environment) throws Exception {
-    BlockResult result;
-
-    Long number = environment.getArgument("number");
-    Hash hash = environment.getArgument("hash");
+  public Block get(final DataFetchingEnvironment environment) throws Exception {
+    LOG.info("QueryBlockFetcher");
+    Block result;
+    UnsignedLong number = environment.getArgument("number");
+    Bytes32 hash = environment.getArgument("hash");
     if (hash != null) {
       result =
-          blockchain.blockByHash(hash).map(tx -> blockResult.transactionComplete(tx)).orElse(null);
+          blockchain
+              .blockByHash(Hash.wrap(hash))
+              .map(tx -> blockResult.transactionComplete(tx))
+              .orElse(null);
     } else if (number != null) {
       result =
           blockchain
-              .blockByNumber(number)
+              .blockByNumber(number.longValue())
               .map(tx -> blockResult.transactionComplete(tx))
               .orElse(null);
     } else {
@@ -50,15 +58,13 @@ public class BlockFetcher implements DataFetcher<BlockResult>, GraphQLRpcFetcher
     return result;
   }
 
-	@Override
-	public String getType() {
-		return GraphQLRpcDataFetcherType.BLOCK.getType();
-	}
-	
-	@Override
-	public String getField() {
-		return GraphQLRpcDataFetcherType.BLOCK.getField();
-	}
+  @Override
+  public String getType() {
+    return GraphQLRpcDataFetcherType.BLOCK.getType();
+  }
 
-
+  @Override
+  public String getField() {
+    return GraphQLRpcDataFetcherType.BLOCK.getField();
+  }
 }

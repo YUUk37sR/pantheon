@@ -358,16 +358,16 @@ public class PantheonCommand implements DefaultCommandValues, Runnable {
       description = "Comma separated origin domain URLs for CORS validation (default: none)")
   private final CorsAllowedOriginsProperty rpcGraphQLCorsAllowedOrigins =
       new CorsAllowedOriginsProperty();
-  
+
   @Option(
-	      names = {"--rpc-graphql-api", "--rpc-graphql-apis"},
-	      paramLabel = "<api name>",
-	      split = ",",
-	      arity = "1..*",
-	      converter = RpcApisConverter.class,
-	      description =
-	          "Comma separated list of APIs to enable on GRAPHQL-RPC HTTP service (default: ${DEFAULT-VALUE})")
-	  private final Collection<RpcApi> rpcGraphQLApis = DEFAULT_JSON_RPC_APIS;
+      names = {"--rpc-graphql-api", "--rpc-graphql-apis"},
+      paramLabel = "<api name>",
+      split = ",",
+      arity = "1..*",
+      converter = RpcApisConverter.class,
+      description =
+          "Comma separated list of APIs to enable on GRAPHQL-RPC HTTP service (default: ${DEFAULT-VALUE})")
+  private final Collection<RpcApi> rpcGraphQLApis = DEFAULT_JSON_RPC_APIS;
 
   @Option(
       names = {"--rpc-graphql-authentication-enabled"},

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 public class BlockResultFactory {
 
-  public BlockResult transactionComplete(
+  public Block transactionComplete(
       final BlockWithMetadata<TransactionWithMetadata, Hash> blockWithMetadata) {
     final List<TransactionResult> txs =
         blockWithMetadata.getTransactions().stream()
@@ -35,7 +35,7 @@ public class BlockResultFactory {
             .map(Hash::toString)
             .map(TextNode::new)
             .collect(Collectors.toList());
-    return new BlockResult(
+    return new Block(
         blockWithMetadata.getHeader(),
         txs,
         ommers,
@@ -43,7 +43,7 @@ public class BlockResultFactory {
         blockWithMetadata.getSize());
   }
 
-  public BlockResult transactionHash(final BlockWithMetadata<Hash, Hash> blockWithMetadata) {
+  public Block transactionHash(final BlockWithMetadata<Hash, Hash> blockWithMetadata) {
     final List<TransactionResult> txs =
         blockWithMetadata.getTransactions().stream()
             .map(Hash::toString)
@@ -54,7 +54,7 @@ public class BlockResultFactory {
             .map(Hash::toString)
             .map(TextNode::new)
             .collect(Collectors.toList());
-    return new BlockResult(
+    return new Block(
         blockWithMetadata.getHeader(),
         txs,
         ommers,

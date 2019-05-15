@@ -17,10 +17,8 @@ import static com.google.common.collect.Streams.stream;
 import static java.util.stream.Collectors.toList;
 import static tech.pegasys.pantheon.util.NetworkUtility.urlForSocketAddress;
 
-import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationService;
-import tech.pegasys.pantheon.ethereum.graphql.authentication.AuthenticationUtils;
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLRpcRequest;
-import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLRpcParameters;
+import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLRpcRequestException;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcError;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcErrorResponse;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcResponse;
@@ -46,7 +44,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Iterables;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
-import graphql.GraphQLError;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -81,8 +78,6 @@ public class GraphQLRpcHttpService {
   private final Path dataDir;
   private final LabelledMetric<OperationTimer> requestTimer;
 
-  @VisibleForTesting public final Optional<AuthenticationService> authenticationService;
-
   private HttpServer httpServer;
 
   /**
@@ -90,9 +85,9 @@ public class GraphQLRpcHttpService {
    *
    * @param vertx The vertx process that will be running this service
    * @param dataDir The data directory where requests can be buffered
-   * @param config Configuration for the rpc methods being loaded
+   * @param config Configuration for the graphql being loaded
    * @param metricsSystem The metrics service that activities should be reported to
-   * @param methods The json rpc methods that should be enabled
+   * @param grapQL GraphQL Object
    */
   public GraphQLRpcHttpService(
       final Vertx vertx,
@@ -100,34 +95,17 @@ public class GraphQLRpcHttpService {
       final GraphQLRpcConfiguration config,
       final MetricsSystem metricsSystem,
       final GraphQL graphQL) {
-    this(
-        vertx,
-        dataDir,
-        config,
-        metricsSystem,
-        graphQL,
-        AuthenticationService.create(vertx, config));
-  }
-
-  private GraphQLRpcHttpService(
-      final Vertx vertx,
-      final Path dataDir,
-      final GraphQLRpcConfiguration config,
-      final MetricsSystem metricsSystem,
-      final GraphQL graphQL,
-      final Optional<AuthenticationService> authenticationService) {
     this.dataDir = dataDir;
     requestTimer =
         metricsSystem.createLabelledTimer(
             MetricCategory.RPC,
             "request_time",
-            "Time taken to process a JSON-RPC request",
+            "Time taken to process a GraphQL-RPC request",
             "methodName");
     validateConfig(config);
     this.config = config;
     this.vertx = vertx;
     this.graphQL = graphQL;
-    this.authenticationService = authenticationService;
   }
 
   private void validateConfig(final GraphQLRpcConfiguration config) {
@@ -214,11 +192,6 @@ public class GraphQLRpcHttpService {
     };
   }
 
-  private String getAuthToken(final RoutingContext routingContext) {
-    return AuthenticationUtils.getJwtTokenFromAuthorizationHeaderValue(
-        routingContext.request().getHeader("Authorization"));
-  }
-
   private Optional<String> getAndValidateHostHeader(final RoutingContext event) {
     final Iterable<String> splitHostHeader = Splitter.on(':').split(event.request().host());
     final long hostPieces = stream(splitHostHeader).count();
@@ -270,38 +243,22 @@ public class GraphQLRpcHttpService {
   }
 
   private void handleGraphQLRpcRequest(final RoutingContext routingContext) {
-    // first check token if authentication is required
-    String token = getAuthToken(routingContext);
-    if (authenticationService.isPresent() && token == null) {
-      // no auth token when auth required
-      handleGraphQLRpcUnauthorizedError(routingContext, null, GraphQLRpcError.UNAUTHORIZED);
-    } else {
-      // Parse json
-      try {
-        final String json = routingContext.getBodyAsString().trim();
-        if (!json.isEmpty() && json.charAt(0) == '{') {
-          AuthenticationUtils.getUser(
-              authenticationService,
-              token,
-              user -> {
-                handleGraphQLSingleRequest(routingContext, new JsonObject(json));
-              });
-        } else {
-          final JsonArray array = new JsonArray(json);
-          if (array.size() < 1) {
-            handleGraphQLRpcError(routingContext, null, GraphQLRpcError.INVALID_REQUEST);
-            return;
-          }
-          AuthenticationUtils.getUser(
-              authenticationService,
-              token,
-              user -> {
-                handleGraphQLBatchRequest(routingContext, array);
-              });
+
+    // Parse json
+    try {
+      final String json = routingContext.getBodyAsString().trim();
+      if (!json.isEmpty() && json.charAt(0) == '{') {
+        handleGraphQLSingleRequest(routingContext, new JsonObject(json));
+      } else {
+        final JsonArray array = new JsonArray(json);
+        if (array.size() < 1) {
+          handleGraphQLRpcError(routingContext, null, GraphQLRpcError.INVALID_REQUEST);
+          return;
         }
-      } catch (final DecodeException ex) {
-        handleGraphQLRpcError(routingContext, null, GraphQLRpcError.PARSE_ERROR);
+        handleGraphQLBatchRequest(routingContext, array);
       }
+    } catch (final DecodeException ex) {
+      handleGraphQLRpcError(routingContext, null, GraphQLRpcError.PARSE_ERROR);
     }
   }
 
@@ -358,7 +315,7 @@ public class GraphQLRpcHttpService {
   @SuppressWarnings("rawtypes")
   private void handleGraphQLBatchRequest(
       final RoutingContext routingContext, final JsonArray jsonArray) {
-    // Interpret json as rpc request
+    // Interpret json as graphql request
     final List<Future> responses =
         jsonArray.stream()
             .map(
@@ -429,10 +386,11 @@ public class GraphQLRpcHttpService {
     // Generate response
     try (final TimingContext ignored = requestTimer.labels(request.getQuery()).startTimer()) {
       ExecutionResult result = graphQL.execute(query);
-      List<GraphQLError> errors = result.getErrors();
-      if (!errors.isEmpty()) return errorResponse(id, GraphQLRpcError.INTERNAL_ERROR);
-      return new GraphQLRpcSuccessResponse(id, result.getData());
-    } catch (final InvalidGraphQLRpcParameters e) {
+      LOG.info(Json.encodePrettily(result.getData()));
+      LOG.info(Json.encodePrettily(result.getErrors()));
+      return new GraphQLRpcSuccessResponse(result.getData(), result.getErrors());
+
+    } catch (final InvalidGraphQLRpcRequestException e) {
       LOG.debug(e);
       return errorResponse(id, GraphQLRpcError.INVALID_PARAMS);
     } catch (final RuntimeException e) {
@@ -446,14 +404,6 @@ public class GraphQLRpcHttpService {
     routingContext
         .response()
         .setStatusCode(HttpResponseStatus.BAD_REQUEST.code())
-        .end(Json.encode(new GraphQLRpcErrorResponse(id, error)));
-  }
-
-  private void handleGraphQLRpcUnauthorizedError(
-      final RoutingContext routingContext, final Object id, final GraphQLRpcError error) {
-    routingContext
-        .response()
-        .setStatusCode(HttpResponseStatus.UNAUTHORIZED.code())
         .end(Json.encode(new GraphQLRpcErrorResponse(id, error)));
   }
 

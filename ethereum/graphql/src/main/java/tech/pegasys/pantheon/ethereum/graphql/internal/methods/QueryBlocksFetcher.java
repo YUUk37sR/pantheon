@@ -15,48 +15,50 @@ package tech.pegasys.pantheon.ethereum.graphql.internal.methods;
 import tech.pegasys.pantheon.ethereum.graphql.internal.exception.InvalidGraphQLRpcRequestException;
 import tech.pegasys.pantheon.ethereum.graphql.internal.queries.BlockchainQueries;
 import tech.pegasys.pantheon.ethereum.graphql.internal.response.GraphQLRpcError;
-import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResult;
+import tech.pegasys.pantheon.ethereum.graphql.internal.results.Block;
 import tech.pegasys.pantheon.ethereum.graphql.internal.results.BlockResultFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import graphql.schema.DataFetcher;
+import com.google.common.primitives.UnsignedLong;
 import graphql.schema.DataFetchingEnvironment;
 
-public class BlocksFetcher implements DataFetcher<List<BlockResult>>, GraphQLRpcFetcher{
+public class QueryBlocksFetcher implements GraphQLRpcFetcher<List<Block>> {
   private final BlockchainQueries blockchain;
   private final BlockResultFactory blockResult = new BlockResultFactory();
 
-  public BlocksFetcher(final BlockchainQueries blockchain) {
+  public QueryBlocksFetcher(final BlockchainQueries blockchain) {
     this.blockchain = blockchain;
   }
 
   @Override
-  public List<BlockResult> get(final DataFetchingEnvironment environment) throws Exception {
-    List<BlockResult> resultList = new ArrayList<>();
+  public List<Block> get(final DataFetchingEnvironment environment)
+      throws InvalidGraphQLRpcRequestException {
+    List<Block> resultList = new ArrayList<>();
 
-    Long to = environment.getArgument("to");
-    if (to == null) to = blockchain.headBlockNumber();
+    UnsignedLong to = environment.getArgument("to");
+    if (to == null) to = UnsignedLong.valueOf(blockchain.headBlockNumber());
 
-    Long from = environment.getArgument("from");
-    if (from == null || from > to)
-      throw new InvalidGraphQLRpcRequestException(GraphQLRpcError.INVALID_PARAMS.getMessage());
+    UnsignedLong from = environment.getArgument("from");
+    if (from == null || from.longValue() > to.longValue())
+      throw new InvalidGraphQLRpcRequestException(
+          GraphQLRpcError.BLOCK_LIST_PARAMETER_ERROR.getMessage(), null);
 
-    for (long i = from; i <= to; ++i)
+    for (long i = from.longValue(); i <= to.longValue(); ++i)
       resultList.add(
           blockchain.blockByNumber(i).map(tx -> blockResult.transactionComplete(tx)).orElse(null));
 
     return resultList;
   }
 
-	@Override
-	public String getType() {
-		return GraphQLRpcDataFetcherType.BLOCKS.getType();
-	}
-	
-	@Override
-	public String getField() {
-		return GraphQLRpcDataFetcherType.BLOCKS.getField();
-	}
+  @Override
+  public String getType() {
+    return GraphQLRpcDataFetcherType.BLOCKS.getType();
+  }
+
+  @Override
+  public String getField() {
+    return GraphQLRpcDataFetcherType.BLOCKS.getField();
+  }
 }

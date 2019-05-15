@@ -22,6 +22,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.primitives.UnsignedLong;
 
 @JsonPropertyOrder({
   "number",
@@ -44,7 +45,7 @@ import com.fasterxml.jackson.databind.JsonNode;
   "uncles",
   "transactions"
 })
-public class BlockResult {
+public class Block {
 
   private final String number;
   private final String hash;
@@ -66,13 +67,13 @@ public class BlockResult {
   private final List<TransactionResult> transactions;
   private final List<JsonNode> ommers;
 
-  public <T extends TransactionResult> BlockResult(
+  public <T extends TransactionResult> Block(
       final BlockHeader header,
       final List<TransactionResult> transactions,
       final List<JsonNode> ommers,
       final UInt256 totalDifficulty,
       final int size) {
-    this.number = Quantity.create(header.getNumber());
+    this.number = UnsignedLong.valueOf(header.getNumber()).toString();
     this.hash = header.getHash().toString();
     this.parentHash = header.getParentHash().toString();
     this.nonce = Quantity.longToPaddedHex(header.getNonce(), 8);
@@ -81,8 +82,7 @@ public class BlockResult {
     this.transactionsRoot = header.getTransactionsRoot().toString();
     this.stateRoot = header.getStateRoot().toString();
     this.receiptsRoot = header.getReceiptsRoot().toString();
-    this.miner =
-        new Account(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY, UInt256.ZERO);
+    this.miner = new Account(header.getCoinbase(), Wei.ZERO, 0L, BytesValue.EMPTY);
     this.difficulty = Quantity.create(header.getDifficulty());
     this.totalDifficulty = Quantity.create(totalDifficulty);
     this.extraData = header.getExtraData().toString();

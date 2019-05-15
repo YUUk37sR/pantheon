@@ -13,6 +13,7 @@
 package tech.pegasys.pantheon;
 
 import tech.pegasys.pantheon.cli.EthNetworkConfig;
+import tech.pegasys.pantheon.config.GenesisConfigOptions;
 import tech.pegasys.pantheon.controller.PantheonController;
 import tech.pegasys.pantheon.crypto.SECP256K1.KeyPair;
 import tech.pegasys.pantheon.ethereum.ProtocolContext;
@@ -24,6 +25,8 @@ import tech.pegasys.pantheon.ethereum.eth.transactions.TransactionPool;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.graphql.GraphQLRpcHttpService;
 import tech.pegasys.pantheon.ethereum.graphql.internal.GraphQLFactory;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcFetcher;
+import tech.pegasys.pantheon.ethereum.graphql.internal.methods.GraphQLRpcFetcherFactory;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcConfiguration;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcHttpService;
 import tech.pegasys.pantheon.ethereum.jsonrpc.JsonRpcMethodsFactory;
@@ -402,27 +405,30 @@ public class RunnerBuilder {
 
     Optional<GraphQLRpcHttpService> graphQLRpcHttpService = Optional.empty();
     if (graphQLRpcConfiguration.isEnabled()) {
-      final GraphQL graphQL =
-          new GraphQLFactory()
-              .graphQL(
-                  PantheonInfo.version(),
-                  ethNetworkConfig.getNetworkId(),
-                  pantheonController.getGenesisConfigOptions(),
-                  peerNetwork,
-                  context.getBlockchain(),
-                  context.getWorldStateArchive(),
-                  synchronizer,
-                  transactionPool,
-                  protocolSchedule,
-                  miningCoordinator,
-                  metricsSystem,
-                  supportedCapabilities,
-                  graphQLRpcConfiguration.getRpcApis(),
-                  accountWhitelistController,
-                  nodeWhitelistController,
-                  privacyParameters,
-                  graphQLRpcConfiguration,
-                  metricsConfiguration);
+      @SuppressWarnings("rawtypes")
+      final Map<String, GraphQLRpcFetcher> graphQLFetchers =
+          graphQLFetchers(
+              PantheonInfo.version(),
+              ethNetworkConfig.getNetworkId(),
+              pantheonController.getGenesisConfigOptions(),
+              peerNetwork,
+              context.getBlockchain(),
+              context.getWorldStateArchive(),
+              synchronizer,
+              transactionPool,
+              protocolSchedule,
+              miningCoordinator,
+              metricsSystem,
+              supportedCapabilities,
+              graphQLRpcConfiguration.getRpcApis(),
+              accountWhitelistController,
+              nodeWhitelistController,
+              privacyParameters,
+              graphQLRpcConfiguration,
+              metricsConfiguration);
+
+      final GraphQL graphQL = new GraphQLFactory().buildGraphQL(graphQLFetchers);
+
       graphQLRpcHttpService =
           Optional.of(
               new GraphQLRpcHttpService(
@@ -515,6 +521,48 @@ public class RunnerBuilder {
                 metricsConfiguration);
     methods.putAll(pantheonController.getAdditionalJsonRpcMethods(jsonRpcApis));
     return methods;
+  }
+
+  @SuppressWarnings("rawtypes")
+  private Map<String, GraphQLRpcFetcher> graphQLFetchers(
+      final String clientVersion,
+      final int networkId,
+      final GenesisConfigOptions genesisConfigOptions,
+      final P2PNetwork peerNetworkingService,
+      final Blockchain blockchain,
+      final WorldStateArchive worldStateArchive,
+      final Synchronizer synchronizer,
+      final TransactionPool transactionPool,
+      final ProtocolSchedule<?> protocolSchedule,
+      final MiningCoordinator miningCoordinator,
+      final MetricsSystem metricsSystem,
+      final Set<Capability> supportedCapabilities,
+      final Collection<RpcApi> rpcApis,
+      final Optional<AccountWhitelistController> accountsWhitelistController,
+      final Optional<NodeLocalConfigPermissioningController> nodeWhitelistController,
+      final PrivacyParameters privacyParameters,
+      final GraphQLRpcConfiguration graphQLRpcConfiguration,
+      final MetricsConfiguration metricsConfiguration) {
+    return new GraphQLRpcFetcherFactory()
+        .fetchers(
+            clientVersion,
+            networkId,
+            genesisConfigOptions,
+            peerNetworkingService,
+            blockchain,
+            worldStateArchive,
+            synchronizer,
+            transactionPool,
+            protocolSchedule,
+            miningCoordinator,
+            metricsSystem,
+            supportedCapabilities,
+            rpcApis,
+            accountsWhitelistController,
+            nodeWhitelistController,
+            privacyParameters,
+            graphQLRpcConfiguration,
+            metricsConfiguration);
   }
 
   private SubscriptionManager createSubscriptionManager(
